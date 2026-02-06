@@ -25,7 +25,7 @@ func main() {
 	command := os.Args[1]
 
 	switch command {
-	case "play":
+	case "local":
 
 		if len(os.Args) < 3 {
 			fmt.Println("Please provide a song name")
