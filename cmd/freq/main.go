@@ -12,14 +12,6 @@ import (
 	"github.com/gopxl/beep/v2/speaker"
 )
 
-// JamendoResponse matches the structure of what Jamendo sends back
-type JamendoResponse struct {
-	Results []struct {
-		Name  string `json:"name"`
-		Audio string `json:"audio"`
-	} `json:"results"`
-}
-
 func main() {
 
 	defaultMusicDir := "C:\\Users\\faruk\\Desktop\\Musics"
