@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/farukkandemir/freq/internal/jamendo"
-	"github.com/farukkandemir/freq/internal/library"
 	"github.com/gopxl/beep/v2"
 	"github.com/gopxl/beep/v2/mp3"
 	"github.com/gopxl/beep/v2/speaker"
@@ -86,25 +85,6 @@ func main() {
 			speaker.Unlock()
 		}
 
-	case "scan":
-
-		if len(os.Args) < 3 {
-			fmt.Println("Please provide a path")
-			return
-		}
-
-		folderName := os.Args[2]
-
-		files, err := library.Scan(folderName)
-
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		for _, file := range files {
-
-			fmt.Println(file)
-		}
 	default:
 		fmt.Printf("Unknown command: %s\n", command)
 
