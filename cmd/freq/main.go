@@ -1,14 +1,13 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
+	"math/rand"
 	"net/http"
 	"os"
-	"path/filepath"
 	"time"
 
+	"github.com/farukkandemir/freq/internal/jamendo"
 	"github.com/farukkandemir/freq/internal/library"
 	"github.com/gopxl/beep/v2"
 	"github.com/gopxl/beep/v2/mp3"
@@ -25,11 +24,7 @@ type JamendoResponse struct {
 	Results []JamendoTrack `json:"results"`
 }
 
-var baseUrl string = "https://api.jamendo.com/v3.0/tracks/?client_id=6e1ba05b&format=jsonpretty&limit=1"
-
 func main() {
-
-	defaultMusicDir := "C:\\Users\\faruk\\Desktop\\Musics"
 
 	if len(os.Args) < 2 {
 		fmt.Println("FREQ >> Digital Audio Utility")
@@ -47,71 +42,27 @@ func main() {
 			return
 		}
 
-		songType := os.Args[2]
+		tag := os.Args[2]
 
-		fullPath := baseUrl + "&" + songType
+		jamClient := jamendo.NewJamendoClient()
 
-		resp, err := http.Get(fullPath)
-
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-
-		body, err := io.ReadAll(resp.Body)
+		tracks, err := jamClient.GetTrack(tag)
 
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("Something went wrong", err)
 			return
 		}
 
-		var tracks JamendoResponse
+		selection := rand.Intn(len(tracks.Results))
+		track := tracks.Results[selection]
 
-		err = json.Unmarshal(body, &tracks)
-
+		resp, err := http.Get(track.Audio)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("Error fetching audio stream:", err)
 			return
 		}
 
-		for _, track := range tracks.Results {
-			fmt.Println(track)
-		}
-
-	case "local":
-
-		if len(os.Args) < 3 {
-			fmt.Println("Please provide a song name")
-			return
-		}
-
-		songName := os.Args[2]
-
-		if filepath.Ext(songName) == "" {
-			songName += ".mp3"
-		}
-
-		var fullPath string
-		if filepath.IsAbs(songName) {
-			fullPath = songName
-		} else {
-			fullPath = filepath.Join(defaultMusicDir, songName)
-		}
-
-		if _, err := os.Stat(fullPath); err != nil {
-			fmt.Println("File not found:", fullPath)
-			return
-		}
-
-		f, err := os.Open(fullPath)
-		defer f.Close()
-
-		if err != nil {
-			fmt.Println("Error:", err)
-			return
-		}
-
-		streamer, format, err := mp3.Decode(f)
+		streamer, format, err := mp3.Decode(resp.Body)
 
 		if err != nil {
 			fmt.Println("Error:", err)
