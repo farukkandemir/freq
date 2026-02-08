@@ -64,7 +64,7 @@ func (j *JamendoClient) get(path string) ([]byte, error) {
 
 func (j *JamendoClient) GetTrack(tag string) (TracksResponse, error) {
 
-	apiEndpoint := fmt.Sprintf("/tracks/?client_id=%s&format=jsonpretty&limit=5&fuzzytags=%s", j.clientId, tag)
+	apiEndpoint := fmt.Sprintf("/tracks/?client_id=%s&format=jsonpretty&limit=20&fuzzytags=%s", j.clientId, tag)
 
 	body, err := j.get(apiEndpoint)
 
